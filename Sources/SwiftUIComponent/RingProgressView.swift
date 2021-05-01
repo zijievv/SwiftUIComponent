@@ -11,7 +11,7 @@
 import SwiftUI
 
 struct RingProgressView: View {
-    private let progress: Double
+    @Binding private var progress: Double
     private let colors: [Color]
     private let backgroundColor: Color
     private let lineWidth: CGFloat
@@ -29,7 +29,7 @@ struct RingProgressView: View {
     ///   - startAngle: The start angle of the progress arc.
     ///   - clockwise: The clockwise.
     init(
-        progress: Double,
+        progress: Binding<Double>,
         startColor: Color,
         endColor: Color,
         backgroundColor: Color,
@@ -37,7 +37,7 @@ struct RingProgressView: View {
         startAngle: Angle = -90.degrees,
         clockwise: Bool = false
     ) {
-        self.progress = progress
+        self._progress = progress
         self.colors = [startColor, endColor]
         self.backgroundColor = backgroundColor
         self.lineWidth = lineWidth
@@ -112,7 +112,7 @@ struct RingProgressView_Previews: PreviewProvider {
         var body: some View {
             VStack {
                 Text(formatter.string(from: p as NSNumber)!)
-                RingProgressView(progress: p,
+                RingProgressView(progress: $p,
                                  startColor: Color(#colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)),
                                  endColor: Color(#colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)),
                                  backgroundColor: .blue,
