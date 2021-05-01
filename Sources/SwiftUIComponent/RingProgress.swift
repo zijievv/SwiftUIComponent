@@ -10,8 +10,8 @@
 
 import SwiftUI
 
-struct RingProgress: View {
-    @Binding private var progress: Double
+struct RingProgress<Value>: View where Value: BinaryFloatingPoint {
+    @Binding private var progress: Value
     private let colors: [Color]
     private let backgroundColor: Color
     private let lineWidth: CGFloat
@@ -29,7 +29,7 @@ struct RingProgress: View {
     ///   - startAngle: The start angle of the progress arc.
     ///   - clockwise: The clockwise.
     init(
-        progress: Binding<Double>,
+        progress: Binding<Value>,
         startColor: Color,
         endColor: Color,
         backgroundColor: Color,
@@ -120,13 +120,31 @@ struct RingProgress_Previews: PreviewProvider {
                              startAngle: -90.degrees,
                              clockwise: false)
                     .frame(width: 300, height: 300, alignment: .center)
-                Button(action: {
-                    withAnimation { p += 0.05 }
-                }) {
-                    Text("Plus")
-                        .font(.largeTitle)
-                        .fontWeight(.semibold)
+
+                HStack {
+                    Spacer(minLength: 0)
+
+                    Button(action: {
+                        withAnimation { p += 0.05 }
+                    }) {
+                        Text("Plus")
+                            .font(.largeTitle)
+                            .fontWeight(.semibold)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    Button(action: {
+                        withAnimation { p -= 0.05 }
+                    }) {
+                        Text("Minus")
+                            .font(.largeTitle)
+                            .fontWeight(.semibold)
+                    }
+
+                    Spacer(minLength: 0)
                 }
+                .padding()
             }
         }
 
