@@ -33,9 +33,13 @@ struct PieChart<Value>: View where Value: BinaryFloatingPoint {
             ZStack {
                 ForEach(manager.sectors, id: \.id) { sector in
                     Sector(startAngle: sector.startAngle, endAngle: sector.endAngle)
-                        .foregroundColor(
-                            sector.color
-                                .reduceOpaque(selected ? (selectedID == sector.id ? 0 : 0.3) : 0)
+                        .fill(
+                            AngularGradient(
+                                gradient: Gradient(colors: [sector.startColor, sector.endColor]),
+                                center: .center,
+                                startAngle: sector.startAngle,
+                                endAngle: sector.endAngle
+                            )
                         )
                         .grayscale(selected ? (selectedID == sector.id ? 0 : 0.5) : 0)
                         .scaleEffect(selectedID == sector.id ? 1.05 : 1)
@@ -79,6 +83,8 @@ struct PieChart_Previews: PreviewProvider {
         ]
 
         @StateObject var manager = PieChartManager<Double>(sectors: data.map { ($0.0, $0.2) })
+        @StateObject var m2 = PieChartManager(values: data.map { $0.0 },
+                                              startColor: Color(#colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)), endColor: Color(#colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1)))
 
         var description: String {
             if manager.selectedID == -1 {
@@ -88,12 +94,27 @@ struct PieChart_Previews: PreviewProvider {
             }
         }
 
+        var d2: String {
+            if m2.selectedID == -1 {
+                return "Not selected"
+            } else {
+                return Self.data[m2.selectedID].1
+            }
+        }
+
         var body: some View {
             VStack {
                 Text(description)
                     .font(Font.system(.largeTitle, design: .rounded).weight(.semibold))
                     .padding()
                 PieChart(manager: manager)
+                    .squareFrame(350)
+
+                Text(d2)
+                    .font(Font.system(.largeTitle, design: .rounded).weight(.semibold))
+                    .padding()
+                PieChart(manager: m2, pieChartAnimation: Animation.interactiveSpring())
+                    .squareFrame(350)
             }
         }
     }

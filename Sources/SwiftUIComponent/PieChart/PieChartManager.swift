@@ -14,7 +14,8 @@ struct SectorModel: Identifiable {
     let id: Int
     let startAngle: Angle
     let endAngle: Angle
-    let color: Color
+    let startColor: Color
+    let endColor: Color
 }
 
 final class PieChartManager<Value>: ObservableObject where Value: BinaryFloatingPoint {
@@ -23,6 +24,35 @@ final class PieChartManager<Value>: ObservableObject where Value: BinaryFloating
 
     init(sectors: [(value: Value, color: Color)]) {
         let values: [Value] = sectors.map { $0.value }
+        let angles: [Angle] = Self.angles(from: values)
+
+        self.sectors = sectors.enumerated().map { sector in
+            let idx = sector.offset
+            return SectorModel(id: idx,
+                               startAngle: angles[idx],
+                               endAngle: angles[idx + 1],
+                               startColor: sector.element.color,
+                               endColor: sector.element.color)
+        }
+
+        self.selectedID = -1
+    }
+
+    init(values: [Value], startColor: Color, endColor: Color) {
+        let angles = Self.angles(from: values)
+
+        self.sectors = values.enumerated().map { item in
+            let idx = item.offset
+            return SectorModel(id: idx,
+                               startAngle: angles[idx],
+                               endAngle: angles[idx + 1],
+                               startColor: startColor,
+                               endColor: endColor)
+        }
+        self.selectedID = -1
+    }
+
+    private static func angles(from values: [Value]) -> [Angle] {
         var accumulations: [Value] = [0] + values
 
         for i in 1..<accumulations.count {
@@ -30,16 +60,6 @@ final class PieChartManager<Value>: ObservableObject where Value: BinaryFloating
         }
 
         let sum: Value = accumulations.last!
-        let angles: [Angle] = accumulations.map { ($0 / sum * 360).degrees }
-
-        self.sectors = sectors.enumerated().map { sector in
-            let idx = sector.offset
-            return SectorModel(id: idx,
-                               startAngle: angles[idx],
-                               endAngle: angles[idx + 1],
-                               color: sector.element.color)
-        }
-
-        self.selectedID = -1
+        return accumulations.map { ($0 / sum * 360).degrees }
     }
 }
