@@ -1,5 +1,5 @@
 //
-//  RingProgressView.swift
+//  RingProgress.swift
 //
 //
 //  Created by zijie vv on 29/04/2021.
@@ -10,7 +10,7 @@
 
 import SwiftUI
 
-struct RingProgressView: View {
+struct RingProgress: View {
     @Binding private var progress: Double
     private let colors: [Color]
     private let backgroundColor: Color
@@ -106,19 +106,19 @@ struct RingProgressView: View {
     }
 }
 
-struct RingProgressView_Previews: PreviewProvider {
+struct RingProgress_Previews: PreviewProvider {
     private struct RPV: View {
         @State var p: Double = 0
         var body: some View {
             VStack {
                 Text(formatter.string(from: p as NSNumber)!)
-                RingProgressView(progress: $p,
-                                 startColor: Color(#colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)),
-                                 endColor: Color(#colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)),
-                                 backgroundColor: .blue,
-                                 lineWidth: 50,
-                                 startAngle: -90.degrees,
-                                 clockwise: false)
+                RingProgress(progress: $p,
+                             startColor: Color(#colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)),
+                             endColor: Color(#colorLiteral(red: 0.4745098054, green: 0.8392156959, blue: 0.9764705896, alpha: 1)),
+                             backgroundColor: .blue,
+                             lineWidth: 50,
+                             startAngle: -90.degrees,
+                             clockwise: false)
                     .frame(width: 300, height: 300, alignment: .center)
                 Button(action: {
                     withAnimation { p += 0.05 }
