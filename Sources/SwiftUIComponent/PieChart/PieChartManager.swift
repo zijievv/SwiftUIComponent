@@ -18,12 +18,12 @@ struct SectorModel: Identifiable {
     let endColor: Color
 }
 
-final class PieChartManager<Value>: ObservableObject where Value: BinaryFloatingPoint {
+final class PieChartManager: ObservableObject {
     @Published var sectors: [SectorModel]
     @Published var selectedID: Int
 
-    init(sectors: [(value: Value, color: Color)]) {
-        let values: [Value] = sectors.map { $0.value }
+    init(sectors: [(value: Double, color: Color)]) {
+        let values: [Double] = sectors.map { $0.value }
         let angles: [Angle] = Self.angles(from: values)
 
         self.sectors = sectors.enumerated().map { sector in
@@ -38,7 +38,7 @@ final class PieChartManager<Value>: ObservableObject where Value: BinaryFloating
         self.selectedID = -1
     }
 
-    init(values: [Value], startColor: Color, endColor: Color) {
+    init(values: [Double], startColor: Color, endColor: Color) {
         let angles = Self.angles(from: values)
 
         self.sectors = values.enumerated().map { item in
@@ -52,14 +52,14 @@ final class PieChartManager<Value>: ObservableObject where Value: BinaryFloating
         self.selectedID = -1
     }
 
-    private static func angles(from values: [Value]) -> [Angle] {
-        var accumulations: [Value] = [0] + values
+    private static func angles(from values: [Double]) -> [Angle] {
+        var accumulations: [Double] = [0] + values
 
         for i in 1..<accumulations.count {
             accumulations[i] += accumulations[i-1]
         }
 
-        let sum: Value = accumulations.last!
+        let sum: Double = accumulations.last!
         return accumulations.map { ($0 / sum * 360).degrees }
     }
 }

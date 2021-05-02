@@ -10,16 +10,16 @@
 
 import SwiftUI
 
-struct PieChart<Value>: View where Value: BinaryFloatingPoint {
+struct PieChart: View {
     @State private var selected = false
     @State private var selectedID: Int = -1
 
-    private let manager: PieChartManager<Value>
+    private let manager: PieChartManager
     private let pieChartAnimation: Animation?
     private let selectedIDAnimation: Animation?
 
     init(
-        manager: PieChartManager<Value>,
+        manager: PieChartManager,
         pieChartAnimation: Animation? = .default,
         selectedIDAnimation: Animation? = nil
     ) {
@@ -82,7 +82,7 @@ struct PieChart_Previews: PreviewProvider {
             (15, "Red", .red),
         ]
 
-        @StateObject var manager = PieChartManager<Double>(sectors: data.map { ($0.0, $0.2) })
+        @StateObject var manager = PieChartManager(sectors: data.map { ($0.0, $0.2) })
         @StateObject var m2 = PieChartManager(values: data.map { $0.0 },
                                               startColor: Color(#colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)), endColor: Color(#colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1)))
 
