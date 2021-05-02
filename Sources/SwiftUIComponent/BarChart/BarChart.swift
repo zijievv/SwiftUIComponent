@@ -53,6 +53,24 @@ struct BarChart: View {
                     }
                 } //: HStack
             } //: ZStack
+            .gesture(
+                DragGesture(coordinateSpace: .local)
+                    .onChanged { value in
+                        let new = Int(
+                            value.location.x / geometry.size.width * CGFloat(manager.ranges.count)
+                        )
+                        if new != selectedID {
+                            selectedID = new
+                            selected = true
+                            manager.selectedID = new
+                        }
+                    }
+                    .onEnded { _ in
+                        selectedID = -1
+                        selected = false
+                        manager.selectedID = -1
+                    }
+            )
         }
     }
 
@@ -65,7 +83,9 @@ struct BarChart_Previews: PreviewProvider {
     static var previews: some View {
         let values: [Double] = [1, 3, 7, 5, 11, 4, 6, 9, 2]
         let manager = BarChartManager(values: values, indicator: 5)
-        return BarChart(manager: manager, barSpacingRatio: 0.02)
+//        return BarChart(manager: manager, barSpacingRatio: 0.02)
+        return BarChart(manager: manager)
+            .foreground(Color.blue)
             .frame(width: 350, height: 350)
     }
 }
