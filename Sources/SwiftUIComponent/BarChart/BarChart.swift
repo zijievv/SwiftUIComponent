@@ -16,17 +16,20 @@ struct BarChart: View {
 
     private let manager: BarChartManager
     private let spacingRatio: CGFloat
+    private let barStyle: BarChartCell.BarStyle
     private let barChartAnimation: Animation?
     private let selectedIDAnimation: Animation?
 
     init(
         manager: BarChartManager,
         barSpacingRatio: CGFloat = 0.0083,
+        barStyle: BarChartCell.BarStyle = .capsule(),
         barChartAnimation: Animation? = .default,
         selectedIDAnimation: Animation? = nil
     ) {
         self.manager = manager
         self.spacingRatio = barSpacingRatio
+        self.barStyle = barStyle
         self.barChartAnimation = barChartAnimation
         self.selectedIDAnimation = selectedIDAnimation
     }
@@ -43,13 +46,16 @@ struct BarChart: View {
 
                 HStack(spacing: geometry.size.width * spacingRatio) {
                     ForEach(Array(manager.ranges.enumerated()), id: \.offset) { idx, range in
-                        BarChartCell(id: idx,
-                                     height: geometry.size.height,
-                                     range: range,
-                                     overallRange: manager.overallRange)
-                            .transition(.slide)
-                            .animation(.ripple(index: idx))
-                            .opacity(selected ? (selectedID == idx ? 1 : 0.33) : 1)
+                        BarChartCell(
+                            id: idx,
+                            height: geometry.size.height,
+                            range: range,
+                            overallRange: manager.overallRange,
+                            barStyle: barStyle
+                        )
+                        .transition(.slide)
+                        .animation(.ripple(index: idx))
+                        .opacity(selected ? (selectedID == idx ? 1 : 0.33) : 1)
                     }
                 } //: HStack
             } //: ZStack

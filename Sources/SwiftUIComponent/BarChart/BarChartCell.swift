@@ -11,26 +11,38 @@
 import SwiftUI
 
 struct BarChartCell: View {
+    enum BarStyle {
+        case capsule(roundedCornerStyle: RoundedCornerStyle = .circular,
+                     strokeStyle: StrokeStyle? = nil)
+        case ellipse(strokeStyle: StrokeStyle? = nil)
+        case roundedRectangle(cornerRadius: CGFloat = 0,
+                              roundedCornerStyle: RoundedCornerStyle = .circular,
+                              strokeStyle: StrokeStyle? = nil)
+    }
+
     let id: Int
     let height: CGFloat
     let range: Range<Double>
     let overallRange: Range<Double>
+    let barStyle: BarStyle
     let backgroundOpacity: Double = 0.001
 
     init(
         id: Int,
         height: CGFloat,
         range: Range<Double>,
-        overallRange: Range<Double>
+        overallRange: Range<Double>,
+        barStyle: BarStyle = .capsule()
     ) {
         self.id = id
         self.height = height
         self.range = range
         self.overallRange = overallRange
+        self.barStyle = barStyle
     }
 
     var body: some View {
-        Capsule()
+        barStyle.view
             .frame(height: barHeight)
             .offset(x: 0, y: yOffset)
             .frame(height: height)
@@ -57,11 +69,35 @@ struct BarChartCell_Previews: PreviewProvider {
                 BarChartCell(id: 1, height: 350, range: 0..<3, overallRange: 0..<10)
                 BarChartCell(id: 1, height: 350, range: 3..<5, overallRange: 0..<10)
                 BarChartCell(id: 1, height: 350, range: 5..<7, overallRange: 0..<10)
-                BarChartCell(id: 1, height: 350, range: 3..<7, overallRange: 0..<10)
+                BarChartCell(id: 1, height: 350, range: 3..<7, overallRange: 0..<10,
+                             barStyle: .ellipse())
             }
             .frame(width: 20)
         }
         .squareFrame(350)
         .background(Color.white.shadow(radius: 10))
+    }
+}
+
+extension BarChartCell.BarStyle {
+    @ViewBuilder fileprivate var view: some View {
+        switch self {
+        case let .capsule(roundedCornerStyle: roundedCornerStyle, strokeStyle: strokeStyle):
+            Capsule(style: roundedCornerStyle)
+                .if(strokeStyle != nil) { capsule in
+                    capsule.stroke(style: strokeStyle!)
+                }
+        case let .ellipse(strokeStyle: strokeStyle):
+            Ellipse().if(strokeStyle != nil) { ellipse in
+                ellipse.stroke(style: strokeStyle!)
+            }
+        case let .roundedRectangle(cornerRadius: cornerRadius,
+                                   roundedCornerStyle: roundedCornerStyle,
+                                   strokeStyle: strokeStyle):
+            RoundedRectangle(cornerRadius: cornerRadius, style: roundedCornerStyle)
+                .if(strokeStyle != nil) { roundedRectangle in
+                    roundedRectangle.stroke(style: strokeStyle!)
+                }
+        }
     }
 }

@@ -13,9 +13,9 @@ import SwiftUI
 extension Color {
     var components: (r: CGFloat, g: CGFloat, b: CGFloat, o: CGFloat) {
         #if canImport(UIKit)
-            typealias NativeColor = UIColor
+        typealias NativeColor = UIColor
         #elseif canImport(AppKit)
-            typealias NativeColor = NSColor
+        typealias NativeColor = NSColor
         #endif
 
         var r: CGFloat = 0

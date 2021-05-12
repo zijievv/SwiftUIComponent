@@ -20,4 +20,15 @@ extension View {
         self.foregroundColor(.clear)
             .overlay(content.mask(self))
     }
+
+    @ViewBuilder func `if`<V>(
+        _ condition: @autoclosure () -> Bool,
+        transform: (Self) -> V
+    ) -> some View where V: View {
+        if condition() {
+            transform(self)
+        } else {
+            self
+        }
+    }
 }
