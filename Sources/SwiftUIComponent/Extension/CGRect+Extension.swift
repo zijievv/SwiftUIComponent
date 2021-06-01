@@ -10,7 +10,7 @@
 
 import SwiftUI
 
-extension CGRect {
+public extension CGRect {
     var minimum: CGFloat { min(width, height) }
     var center: CGPoint { CGPoint(x: midX, y: midY) }
 }

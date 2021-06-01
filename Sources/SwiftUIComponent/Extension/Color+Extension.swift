@@ -23,8 +23,7 @@ extension Color {
         var b: CGFloat = 0
         var o: CGFloat = 0
 
-        guard NativeColor(self)
-            .getRed(&r, green: &g, blue: &b, alpha: &o) else {
+        guard NativeColor(self).getRed(&r, green: &g, blue: &b, alpha: &o) else {
             return (0, 0, 0, 0)
         }
 

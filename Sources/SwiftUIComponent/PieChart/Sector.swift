@@ -10,18 +10,18 @@
 
 import SwiftUI
 
-struct Sector: Shape {
+public struct Sector: Shape {
     private let startAngle: Angle
     private let endAngle: Angle
     private let clockwise: Bool
 
-    init(startAngle: Angle, endAngle: Angle, clockwise: Bool = false) {
+    public init(startAngle: Angle, endAngle: Angle, clockwise: Bool = false) {
         self.startAngle = startAngle
         self.endAngle = endAngle
         self.clockwise = clockwise
     }
 
-    func path(in rect: CGRect) -> Path {
+    public func path(in rect: CGRect) -> Path {
         let radius = rect.minimum / 2
         let center = rect.center
 

@@ -10,7 +10,7 @@
 
 import SwiftUI
 
-extension GeometryProxy {
+public extension GeometryProxy {
     @inlinable
     var minimum: CGFloat {
         min(self.size.width, self.size.height)

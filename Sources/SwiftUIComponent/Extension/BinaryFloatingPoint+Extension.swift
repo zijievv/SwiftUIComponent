@@ -10,7 +10,7 @@
 
 import SwiftUI
 
-extension BinaryFloatingPoint {
+public extension BinaryFloatingPoint {
     var degrees: Angle { Angle.degrees(Double(self)) }
     var radians: Angle { Angle.radians(Double(self)) }
     var double: Double { Double(self) }

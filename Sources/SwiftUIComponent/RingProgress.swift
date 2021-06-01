@@ -10,7 +10,7 @@
 
 import SwiftUI
 
-struct RingProgress<Value>: View where Value: BinaryFloatingPoint {
+public struct RingProgress<Value>: View where Value: BinaryFloatingPoint {
     @Binding private var progress: Value
     private let colors: [Color]
     private let backgroundColor: Color
@@ -28,7 +28,7 @@ struct RingProgress<Value>: View where Value: BinaryFloatingPoint {
     ///   - lineWidth: The width of the ring.
     ///   - startAngle: The start angle of the progress arc.
     ///   - clockwise: The clockwise.
-    init(
+    public init(
         progress: Binding<Value>,
         startColor: Color,
         endColor: Color,
@@ -45,7 +45,7 @@ struct RingProgress<Value>: View where Value: BinaryFloatingPoint {
         self.clockwise = clockwise
     }
 
-    var body: some View {
+    public var body: some View {
         GeometryReader { geometry in
             ZStack {
                 // Background ring

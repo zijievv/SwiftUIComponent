@@ -8,7 +8,7 @@
 //  ================================================================================================
 //
 
-extension Collection {
+public extension Collection {
     func overallRange<Value>() -> Range<Value>
         where Element == Range<Value>, Value: AdditiveArithmetic {
         guard !isEmpty else { return Range<Value>(uncheckedBounds: (.zero, .zero)) }

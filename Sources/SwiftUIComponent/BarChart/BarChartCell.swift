@@ -10,8 +10,8 @@
 
 import SwiftUI
 
-struct BarChartCell: View {
-    enum BarStyle {
+public struct BarChartCell: View {
+    public enum BarStyle {
         case capsule(roundedCornerStyle: RoundedCornerStyle = .circular,
                      strokeStyle: StrokeStyle? = nil)
         case ellipse(strokeStyle: StrokeStyle? = nil)
@@ -27,7 +27,7 @@ struct BarChartCell: View {
     let barStyle: BarStyle
     let backgroundOpacity: Double = 0.001
 
-    init(
+    public init(
         id: Int,
         height: CGFloat,
         range: Range<Double>,
@@ -41,7 +41,7 @@ struct BarChartCell: View {
         self.barStyle = barStyle
     }
 
-    var body: some View {
+    public var body: some View {
         barStyle.view
             .frame(height: barHeight)
             .offset(x: 0, y: yOffset)

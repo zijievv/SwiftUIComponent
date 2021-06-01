@@ -10,13 +10,13 @@
 
 import SwiftUI
 
-final class BarChartManager: ObservableObject {
+public final class BarChartManager: ObservableObject {
     @Published var selectedID: Int
     var ranges: [Range<Double>]
     var overallRange: Range<Double>
     var indicator: Double?
 
-    init(ranges: [Range<Double>], indicator: Double? = nil) {
+    public init(ranges: [Range<Double>], indicator: Double? = nil) {
         self.selectedID = -1
         self.ranges = ranges
         self.indicator = indicator
@@ -34,7 +34,7 @@ final class BarChartManager: ObservableObject {
         }
     }
 
-    init(floatingValues: [Double], origin: Double = 0, indicator: Double? = nil) {
+    public init(floatingValues: [Double], origin: Double = 0, indicator: Double? = nil) {
         self.selectedID = -1
         let tempRanges = Self.floatingRanges(from: origin, to: floatingValues)
         self.ranges = tempRanges
@@ -53,7 +53,7 @@ final class BarChartManager: ObservableObject {
         }
     }
 
-    init(values: [Double], indicator: Double? = nil) {
+    public init(values: [Double], indicator: Double? = nil) {
         self.selectedID = -1
         let tempRanges = values.map { 0..<$0 }
         self.ranges = tempRanges

@@ -10,7 +10,7 @@
 
 import SwiftUI
 
-struct BarChart: View {
+public struct BarChart: View {
     @State private var selectedID: Int = -1
     @State private var selected: Bool = false
 
@@ -20,7 +20,7 @@ struct BarChart: View {
     private let barChartAnimation: Animation?
     private let selectedIDAnimation: Animation?
 
-    init(
+    public init(
         manager: BarChartManager,
         barSpacingRatio: CGFloat = 0.0083,
         barStyle: BarChartCell.BarStyle = .capsule(),
@@ -34,7 +34,7 @@ struct BarChart: View {
         self.selectedIDAnimation = selectedIDAnimation
     }
 
-    var body: some View {
+    public var body: some View {
         GeometryReader { geometry in
             ZStack {
                 if manager.indicator != nil {

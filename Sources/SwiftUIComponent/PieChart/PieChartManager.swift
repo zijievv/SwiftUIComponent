@@ -10,19 +10,19 @@
 
 import SwiftUI
 
-struct SectorModel: Identifiable {
-    let id: Int
+public struct SectorModel: Identifiable {
+    public let id: Int
     let startAngle: Angle
     let endAngle: Angle
     let startColor: Color
     let endColor: Color
 }
 
-final class PieChartManager: ObservableObject {
+public final class PieChartManager: ObservableObject {
     @Published var sectors: [SectorModel]
     @Published var selectedID: Int
 
-    init(sectors: [(value: Double, color: Color)]) {
+    public init(sectors: [(value: Double, color: Color)]) {
         let values: [Double] = sectors.map { $0.value }
         let angles: [Angle] = Self.angles(from: values)
 
@@ -38,7 +38,7 @@ final class PieChartManager: ObservableObject {
         self.selectedID = -1
     }
 
-    init(values: [Double], startColor: Color, endColor: Color) {
+    public init(values: [Double], startColor: Color, endColor: Color) {
         let angles = Self.angles(from: values)
 
         self.sectors = values.enumerated().map { item in

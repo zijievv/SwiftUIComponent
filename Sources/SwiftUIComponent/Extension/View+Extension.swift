@@ -10,7 +10,7 @@
 
 import SwiftUI
 
-extension View {
+public extension View {
     @inlinable
     func squareFrame(_ size: CGFloat, alignment: Alignment = .center) -> some View {
         self.frame(width: size, height: size, alignment: alignment)

@@ -10,7 +10,7 @@
 
 import SwiftUI
 
-struct PieChart: View {
+public struct PieChart: View {
     @State private var selected = false
     @State private var selectedID: Int = -1
 
@@ -18,7 +18,7 @@ struct PieChart: View {
     private let pieChartAnimation: Animation?
     private let selectedIDAnimation: Animation?
 
-    init(
+    public init(
         manager: PieChartManager,
         pieChartAnimation: Animation? = .default,
         selectedIDAnimation: Animation? = nil
@@ -28,7 +28,7 @@ struct PieChart: View {
         self.selectedIDAnimation = selectedIDAnimation
     }
 
-    var body: some View {
+    public var body: some View {
         GeometryReader { geometry in
             ZStack {
                 ForEach(manager.sectors, id: \.id) { sector in

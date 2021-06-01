@@ -8,6 +8,6 @@
 //  ================================================================================================
 //
 
-extension Range where Bound: BinaryFloatingPoint {
+public extension Range where Bound: BinaryFloatingPoint {
     var magnitude: Bound { upperBound - lowerBound }
 }
