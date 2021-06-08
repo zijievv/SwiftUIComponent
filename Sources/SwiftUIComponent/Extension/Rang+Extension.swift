@@ -8,6 +8,6 @@
 //  ================================================================================================
 //
 
-public extension Range where Bound: BinaryFloatingPoint {
+extension Range where Bound: AdditiveArithmetic {
     var magnitude: Bound { upperBound - lowerBound }
 }

@@ -87,7 +87,7 @@ struct BarChartCell_Previews: PreviewProvider {
                              style: .capsule(strokeStyle: StrokeStyle(lineWidth: 2)))
             }
         }
-        .frame(width: 350, height: 350)
+        .squareFrame(350)
         .padding()
         .background(Color.white.shadow(radius: 10))
     }

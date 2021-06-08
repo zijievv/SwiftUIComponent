@@ -68,7 +68,7 @@ public struct PieChart: View {
             } //: ZStack
             .rotationEffect(Angle(degrees: -90))
             .padding(16)
-            .squareFrame(geometry.minimum)
+            .squareFrame(min(geometry.size.width, geometry.size.height))
         }
     }
 

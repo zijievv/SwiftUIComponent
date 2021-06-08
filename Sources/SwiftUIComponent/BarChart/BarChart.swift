@@ -172,7 +172,7 @@ struct BarChart_Previews: PreviewProvider {
             BarChart(ranges: values,
                      indicator: 6, selectedID: .constant(-1))
                 .foregroundColor(.blue)
-                .frame(width: 350, height: 350, alignment: .center)
+                .squareFrame(350)
                 .background(Color.white.shadow(radius: 5))
         }
     }

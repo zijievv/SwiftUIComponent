@@ -34,7 +34,7 @@ public struct RingProgress<Value>: View where Value: BinaryFloatingPoint {
         endColor: Color,
         backgroundColor: Color,
         lineWidth: CGFloat,
-        startAngle: Angle = -90.degrees,
+        startAngle: Angle = Angle(degrees: -90),
         clockwise: Bool = false
     ) {
         self.progress = progress
@@ -119,7 +119,7 @@ struct RingProgress_Previews: PreviewProvider {
                              lineWidth: 50,
                              startAngle: -90.degrees,
                              clockwise: false)
-                    .frame(width: 300, height: 300, alignment: .center)
+                    .squareFrame(300)
 
                 HStack {
                     Spacer(minLength: 0)

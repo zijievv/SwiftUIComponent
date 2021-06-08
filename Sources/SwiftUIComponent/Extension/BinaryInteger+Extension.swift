@@ -10,7 +10,7 @@
 
 import SwiftUI
 
-public extension BinaryInteger {
-    var degrees: Angle { Angle.degrees(Double(self)) }
-    var radians: Angle { Angle.radians(Double(self)) }
+extension BinaryInteger {
+    @inlinable var degrees: Angle { Angle.degrees(Double(self)) }
+    @inlinable var radians: Angle { Angle.radians(Double(self)) }
 }

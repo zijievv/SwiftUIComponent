@@ -8,12 +8,12 @@
 //  ================================================================================================
 //
 
-public extension Collection {
-    func overallRange<Value>() -> Range<Value>
-        where Element == Range<Value>, Value: AdditiveArithmetic {
-        guard !isEmpty else { return Range<Value>(uncheckedBounds: (.zero, .zero)) }
-        let lower = self.lazy.map { $0.lowerBound }.min()!
-        let upper = self.lazy.map { $0.upperBound }.max()!
-        return lower..<upper
+extension Collection {
+    func overallRange<T>() -> Range<T> where Element == Range<T>, T: AdditiveArithmetic {
+        guard let lower = self.lazy.map(\.lowerBound).min(),
+              let upper = self.lazy.map(\.upperBound).max() else {
+            return Range<T>(uncheckedBounds: (.zero, .zero))
+        }
+        return Range(uncheckedBounds: (lower, upper))
     }
 }

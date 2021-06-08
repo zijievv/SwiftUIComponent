@@ -10,17 +10,13 @@
 
 import SwiftUI
 
-public extension View {
+extension View {
     @inlinable
     func squareFrame(_ size: CGFloat, alignment: Alignment = .center) -> some View {
         self.frame(width: size, height: size, alignment: alignment)
     }
 
-    func foreground<V: View>(_ content: V) -> some View {
-        self.foregroundColor(.clear)
-            .overlay(content.mask(self))
-    }
-
+    @inlinable
     @ViewBuilder func `if`<V>(
         _ condition: @autoclosure () -> Bool,
         transform: (Self) -> V
