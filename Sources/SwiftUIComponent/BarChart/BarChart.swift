@@ -11,87 +11,169 @@
 import SwiftUI
 
 public struct BarChart: View {
-    @State private var selectedID: Int = -1
-    @State private var selected: Bool = false
-
-    private let manager: BarChartManager
-    private let spacingRatio: CGFloat
-    private let barStyle: BarChartCell.BarStyle
-    private let barChartAnimation: Animation?
-    private let selectedIDAnimation: Animation?
+    @Binding var selectedID: Int
+    let ranges: [Range<Double>]
+    let indicator: Double?
+    let overallRange: Range<Double>
+    let spacingScale: CGFloat
+    let style: BarChartCell.Style
+    let chartAnimation: Animation?
+    let transition: AnyTransition
 
     public init(
-        manager: BarChartManager,
-        barSpacingRatio: CGFloat = 0.0083,
-        barStyle: BarChartCell.BarStyle = .capsule(),
-        barChartAnimation: Animation? = .default,
-        selectedIDAnimation: Animation? = nil
+        ranges: [Range<Double>],
+        indicator: Double? = nil,
+        selectedID: Binding<Int>,
+        barSpacingScale: CGFloat = 0.0083,
+        barStyle: BarChartCell.Style = .capsule(),
+        animation: Animation? = .default,
+        transition: AnyTransition = .slide
     ) {
-        self.manager = manager
-        self.spacingRatio = barSpacingRatio
-        self.barStyle = barStyle
-        self.barChartAnimation = barChartAnimation
-        self.selectedIDAnimation = selectedIDAnimation
+        self.ranges = ranges
+        self.indicator = indicator
+        self.overallRange = Self.overallRange(of: ranges, indicator: indicator)
+        self._selectedID = selectedID
+        self.spacingScale = barSpacingScale
+        self.style = barStyle
+        self.chartAnimation = animation
+        self.transition = transition
+    }
+
+    public init(
+        origin: Double = 0,
+        floatingIntervals intervals: [Double],
+        indicator: Double? = nil,
+        selectedID: Binding<Int>,
+        barSpacingScale: CGFloat = 0.0083,
+        barStyle: BarChartCell.Style = .capsule(),
+        animation: Animation? = .default,
+        transition: AnyTransition = .slide
+    ) {
+        self.ranges = Self.floatingRanges(origin: origin, adding: intervals)
+        self.indicator = indicator
+        self.overallRange = Self.overallRange(of: ranges, indicator: indicator)
+        self._selectedID = selectedID
+        self.spacingScale = barSpacingScale
+        self.style = barStyle
+        self.chartAnimation = animation
+        self.transition = transition
+    }
+
+    public init(
+        values: [Double],
+        indicator: Double? = nil,
+        selectedID: Binding<Int>,
+        barSpacingScale: CGFloat = 0.0083,
+        barStyle: BarChartCell.Style = .capsule(),
+        animation: Animation? = .default,
+        transition: AnyTransition = .slide
+    ) {
+        self.ranges = values.map { 0..<$0 }
+        self.indicator = indicator
+        self.overallRange = Self.overallRange(of: ranges, indicator: indicator)
+        self._selectedID = selectedID
+        self.spacingScale = barSpacingScale
+        self.style = barStyle
+        self.chartAnimation = animation
+        self.transition = transition
     }
 
     public var body: some View {
         GeometryReader { geometry in
             ZStack {
-                if manager.indicator != nil {
-                    Rectangle()
-                        .frame(width: geometry.size.width, height: 1)
-                        .offset(x: 0, y: yOffsetIndicator(with: geometry))
-                        .transition(.slide)
-                }
-
-                HStack(spacing: geometry.size.width * spacingRatio) {
-                    ForEach(Array(manager.ranges.enumerated()), id: \.offset) { idx, range in
-                        BarChartCell(
-                            id: idx,
-                            height: geometry.size.height,
-                            range: range,
-                            overallRange: manager.overallRange,
-                            barStyle: barStyle
-                        )
-                        .transition(.slide)
-                        .animation(.ripple(index: idx))
-                        .opacity(selected ? (selectedID == idx ? 1 : 0.33) : 1)
+                Rectangle()
+                    .foregroundColor(.clear)
+                if !ranges.isEmpty {
+                    if indicator != nil {
+                        Rectangle()
+                            .frame(width: geometry.size.width, height: 1)
+                            .offset(x: 0, y: indicatorYOffset(with: geometry))
+                            .transition(transition)
                     }
-                } //: HStack
+
+                    HStack(spacing: geometry.size.width * spacingScale) {
+                        ForEach(Array(ranges.enumerated()), id: \.offset) { offset, range in
+                            BarChartCell(
+                                id: offset,
+                                height: geometry.size.height,
+                                range: range,
+                                overallRange: overallRange,
+                                style: style
+                            )
+                            .transition(transition)
+                            .animation(chartAnimation)
+                            .opacity(!selecting || selectedID == offset ? 1 : 0.33)
+                        }
+                    }
+                }
             } //: ZStack
             .gesture(
                 DragGesture(coordinateSpace: .local)
                     .onChanged { value in
                         let new = Int(
-                            value.location.x / geometry.size.width * CGFloat(manager.ranges.count)
+                            value.location.x / geometry.size.width * CGFloat(ranges.count)
                         )
                         if new != selectedID {
                             selectedID = new
-                            selected = true
-                            manager.selectedID = new
                         }
                     }
                     .onEnded { _ in
                         selectedID = -1
-                        selected = false
-                        manager.selectedID = -1
                     }
             )
         }
     }
 
-    private func yOffsetIndicator(with geometry: GeometryProxy) -> CGFloat {
-        -geometry.minimum * CGFloat(manager.indicator! / manager.overallRange.magnitude)
+    private var selecting: Bool {
+        Range<Int>(uncheckedBounds: (0, ranges.count)).contains(selectedID)
+    }
+
+    private func indicatorYOffset(with geometry: GeometryProxy) -> CGFloat {
+        let overall = overallRange
+        let numerator = indicator! - overall.lowerBound
+        let denominator = overall.magnitude
+        return geometry.size.height * CGFloat(0.5 - numerator / denominator)
+    }
+
+    private static func overallRange(of ranges: [Range<Double>],
+                                     indicator: Double?) -> Range<Double> {
+        let all = ranges.overallRange()
+        if let indicator = indicator {
+            return Range(uncheckedBounds: (min(all.lowerBound, indicator),
+                                           max(all.upperBound, indicator)))
+        } else {
+            return all
+        }
+    }
+
+    private static func floatingRanges(origin: Double,
+                                       adding intervals: [Double]) -> [Range<Double>] {
+        var bounds = [origin]
+        for value in intervals {
+            bounds.append(bounds.last! + value)
+        }
+        var ranges: [Range<Double>] = []
+        ranges.reserveCapacity(intervals.count)
+        for i in Range(uncheckedBounds: (0, bounds.count - 1)) {
+            if bounds[i] < bounds[i+1] {
+                ranges.append(Range(uncheckedBounds: (bounds[i], bounds[i+1])))
+            } else {
+                ranges.append(Range(uncheckedBounds: (bounds[i+1], bounds[i])))
+            }
+        }
+        return ranges
     }
 }
 
 struct BarChart_Previews: PreviewProvider {
     static var previews: some View {
-        let values: [Double] = [1, 3, 7, 5, 11, 4, 6, 9, 2]
-        let manager = BarChartManager(values: values, indicator: 5)
-//        return BarChart(manager: manager, barSpacingRatio: 0.02)
-        return BarChart(manager: manager)
-            .foreground(Color.blue)
-            .frame(width: 350, height: 350)
+        let values: [Range<Double>] = [-1..<1, -6..<3, 1..<5, -7..<6, -6..<7, 0..<9, 0..<14]
+        return VStack {
+            BarChart(ranges: values,
+                     indicator: 6, selectedID: .constant(-1))
+                .foregroundColor(.blue)
+                .frame(width: 350, height: 350, alignment: .center)
+                .background(Color.white.shadow(radius: 5))
+        }
     }
 }
