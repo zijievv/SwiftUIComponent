@@ -11,115 +11,95 @@
 import SwiftUI
 
 public struct PieChart: View {
-    @State private var selected = false
-    @State private var selectedID: Int = -1
-
+    @Binding var selectedID: Int
     private let manager: PieChartManager
-    private let pieChartAnimation: Animation?
-    private let selectedIDAnimation: Animation?
+    private let selectedAnimation: Animation?
 
     public init(
-        manager: PieChartManager,
-        pieChartAnimation: Animation? = .default,
-        selectedIDAnimation: Animation? = nil
+        selectedID: Binding<Int>,
+        sectors: [(Double, Color)],
+        selectedAnimation: Animation? = .default
     ) {
-        self.manager = manager
-        self.pieChartAnimation = pieChartAnimation
-        self.selectedIDAnimation = selectedIDAnimation
+        self._selectedID = selectedID
+        self.manager = PieChartManager(sectors: sectors)
+        self.selectedAnimation = selectedAnimation
+    }
+
+    public init(
+        selectedID: Binding<Int>,
+        values: [Double],
+        startColor: Color,
+        endColor: Color,
+        selectedAnimation: Animation? = .default
+    ) {
+        self._selectedID = selectedID
+        self.manager = PieChartManager(values: values, startColor: startColor, endColor: endColor)
+        self.selectedAnimation = selectedAnimation
     }
 
     public var body: some View {
         GeometryReader { geometry in
             ZStack {
                 ForEach(manager.sectors, id: \.id) { sector in
-                    Sector(startAngle: sector.startAngle, endAngle: sector.endAngle)
+                    Sector(from: sector.start, to: sector.end)
                         .fill(
                             AngularGradient(
-                                gradient: Gradient(colors: [sector.startColor, sector.endColor]),
+                                gradient: Gradient(colors: sector.colors),
                                 center: .center,
-                                startAngle: sector.startAngle,
-                                endAngle: sector.endAngle
+                                startAngle: sector.start,
+                                endAngle: sector.end
                             )
                         )
-                        .grayscale(selected ? (selectedID == sector.id ? 0 : 0.5) : 0)
+                        .grayscale(!selecting || selectedID == sector.id ? 0 : 0.5)
                         .scaleEffect(selectedID == sector.id ? 1.05 : 1)
                         .shadow(color: .black, radius: selectedID == sector.id ? 5 : 0, x: 0, y: 0)
                         .onTapGesture {
                             if selectedID == sector.id {
-                                withAnimation(pieChartAnimation) {
+                                withAnimation(selectedAnimation) {
                                     selectedID = -1
-                                    selected = false
-                                }
-
-                                withAnimation(selectedIDAnimation) {
-                                    manager.selectedID = -1
                                 }
                             } else {
-                                withAnimation(pieChartAnimation) {
+                                withAnimation(selectedAnimation) {
                                     selectedID = sector.id
-                                    selected = true
-                                }
-
-                                withAnimation(selectedIDAnimation) {
-                                    manager.selectedID = sector.id
                                 }
                             }
                         }
                 }
-            }
-            .rotationEffect(-90.degrees)
+            } //: ZStack
+            .rotationEffect(Angle(degrees: -90))
             .padding(16)
             .squareFrame(geometry.minimum)
         }
     }
+
+    private var selecting: Bool {
+        Range<Int>(uncheckedBounds: (0, manager.sectors.count)).contains(selectedID)
+    }
 }
 
 struct PieChart_Previews: PreviewProvider {
-    private struct PCP: View {
-        static let data: [(Double, String, Color)] = [
-            (55, "Blue", .blue),
-            (30, "Green", .green),
-            (15, "Red", .red),
-        ]
+    static var previews: some View {
+        PieChartPreview()
+    }
+}
 
-        @StateObject var manager = PieChartManager(sectors: data.map { ($0.0, $0.2) })
-        @StateObject var m2 = PieChartManager(values: data.map { $0.0 },
-                                              startColor: Color(#colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)), endColor: Color(#colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1)))
+fileprivate struct PieChartPreview: View {
+    @State var selectedID: Int = 5
+    let values: [Double] = [6, 7, 9]
+    let colors: [Color] = [.blue, .red, .yellow]
 
-        var description: String {
-            if manager.selectedID == -1 {
-                return "Not selected"
-            } else {
-                return Self.data[manager.selectedID].1
-            }
-        }
-
-        var d2: String {
-            if m2.selectedID == -1 {
-                return "Not selected"
-            } else {
-                return Self.data[m2.selectedID].1
-            }
-        }
-
-        var body: some View {
-            VStack {
-                Text(description)
-                    .font(Font.system(.largeTitle, design: .rounded).weight(.semibold))
-                    .padding()
-                PieChart(manager: manager)
-                    .squareFrame(350)
-
-                Text(d2)
-                    .font(Font.system(.largeTitle, design: .rounded).weight(.semibold))
-                    .padding()
-                PieChart(manager: m2, pieChartAnimation: Animation.interactiveSpring())
-                    .squareFrame(350)
-            }
+    var body: some View {
+        VStack {
+            Text(pieDescription)
+            PieChart(selectedID: $selectedID, sectors: Array(zip(values, colors)))
+                .squareFrame(350)
         }
     }
 
-    static var previews: some View {
-        PCP()
+    private var pieDescription: String {
+        guard selectedID >= 0 else {
+            return "Nil"
+        }
+        return "\(values[selectedID]) -- \(colors[selectedID].description)"
     }
 }

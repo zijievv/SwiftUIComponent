@@ -11,37 +11,36 @@
 import SwiftUI
 
 public struct Sector: Shape {
-    private let startAngle: Angle
-    private let endAngle: Angle
+    private let start: Angle
+    private let end: Angle
     private let clockwise: Bool
 
-    public init(startAngle: Angle, endAngle: Angle, clockwise: Bool = false) {
-        self.startAngle = startAngle
-        self.endAngle = endAngle
+    public init(from startAngle: Angle, to endAngle: Angle, clockwise: Bool = false) {
+        start = startAngle
+        end = endAngle
         self.clockwise = clockwise
     }
 
     public func path(in rect: CGRect) -> Path {
-        let radius = rect.minimum / 2
-        let center = rect.center
-
+        let center = CGPoint(x: rect.midX, y: rect.midY)
         let path = Path { path in
             path.move(to: center)
             path.addLine(to: center)
-            path.addArc(center: center,
-                        radius: radius,
-                        startAngle: startAngle,
-                        endAngle: endAngle,
-                        clockwise: clockwise)
+            path.addArc(
+                center: center,
+                radius: min(rect.width, rect.height) / 2,
+                startAngle: start,
+                endAngle: end,
+                clockwise: clockwise
+            )
             path.closeSubpath()
         }
-
         return path
     }
 }
 
 struct Sector_Previews: PreviewProvider {
     static var previews: some View {
-        Sector(startAngle: 0.degrees, endAngle: -90.degrees, clockwise: true)
+        Sector(from: Angle(degrees: 0), to: Angle(degrees: -90), clockwise: true)
     }
 }

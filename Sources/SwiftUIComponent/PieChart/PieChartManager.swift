@@ -10,56 +10,52 @@
 
 import SwiftUI
 
-public struct SectorModel: Identifiable {
-    public let id: Int
-    let startAngle: Angle
-    let endAngle: Angle
+struct SectorModel: Identifiable {
+    let id: Int
+    let start: Angle
+    let end: Angle
     let startColor: Color
     let endColor: Color
+
+    var colors: [Color] { [startColor, endColor] }
 }
 
-public final class PieChartManager: ObservableObject {
-    @Published var sectors: [SectorModel]
-    @Published var selectedID: Int
+final class PieChartManager {
+    let sectors: [SectorModel]
 
-    public init(sectors: [(value: Double, color: Color)]) {
-        let values: [Double] = sectors.map { $0.value }
+    init(sectors: [(value: Double, color: Color)]) {
+        let values: [Double] = sectors.map(\.value)
         let angles: [Angle] = Self.angles(from: values)
-
-        self.sectors = sectors.enumerated().map { sector in
-            let idx = sector.offset
-            return SectorModel(id: idx,
-                               startAngle: angles[idx],
-                               endAngle: angles[idx + 1],
-                               startColor: sector.element.color,
-                               endColor: sector.element.color)
+        self.sectors = sectors.lazy.enumerated().map { offset, sector in
+            SectorModel(
+                id: offset,
+                start: angles[offset],
+                end: angles[offset+1],
+                startColor: sector.color,
+                endColor: sector.color
+            )
         }
-
-        self.selectedID = -1
     }
 
-    public init(values: [Double], startColor: Color, endColor: Color) {
+    init(values: [Double], startColor: Color, endColor: Color) {
         let angles = Self.angles(from: values)
-
-        self.sectors = values.enumerated().map { item in
-            let idx = item.offset
-            return SectorModel(id: idx,
-                               startAngle: angles[idx],
-                               endAngle: angles[idx + 1],
-                               startColor: startColor,
-                               endColor: endColor)
+        self.sectors = values.lazy.enumerated().map { offset, _ in
+            SectorModel(
+                id: offset,
+                start: angles[offset],
+                end: angles[offset+1],
+                startColor: startColor,
+                endColor: endColor
+            )
         }
-        self.selectedID = -1
     }
 
     private static func angles(from values: [Double]) -> [Angle] {
-        var accumulations: [Double] = [0] + values
-
-        for i in 1..<accumulations.count {
-            accumulations[i] += accumulations[i-1]
+        var accumulations: [Double] = [0]
+        for value in values {
+            accumulations.append(accumulations.last! + value)
         }
-
         let sum: Double = accumulations.last!
-        return accumulations.map { ($0 / sum * 360).degrees }
+        return accumulations.map { Angle(degrees: $0 / sum * 360) }
     }
 }
