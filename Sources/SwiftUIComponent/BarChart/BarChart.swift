@@ -21,9 +21,9 @@ public struct BarChart: View {
     let transition: AnyTransition
 
     public init(
+        selectedID: Binding<Int>,
         ranges: [Range<Double>],
         indicator: Double? = nil,
-        selectedID: Binding<Int>,
         barSpacingScale: CGFloat = 0.0083,
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
@@ -40,10 +40,10 @@ public struct BarChart: View {
     }
 
     public init(
+        selectedID: Binding<Int>,
         origin: Double = 0,
         floatingIntervals intervals: [Double],
         indicator: Double? = nil,
-        selectedID: Binding<Int>,
         barSpacingScale: CGFloat = 0.0083,
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
@@ -60,9 +60,9 @@ public struct BarChart: View {
     }
 
     public init(
+        selectedID: Binding<Int>,
         values: [Double],
         indicator: Double? = nil,
-        selectedID: Binding<Int>,
         barSpacingScale: CGFloat = 0.0083,
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
@@ -169,8 +169,7 @@ struct BarChart_Previews: PreviewProvider {
     static var previews: some View {
         let values: [Range<Double>] = [-1..<1, -6..<3, 1..<5, -7..<6, -6..<7, 0..<9, 0..<14]
         return VStack {
-            BarChart(ranges: values,
-                     indicator: 6, selectedID: .constant(-1))
+            BarChart(selectedID: .constant(-1), ranges: values, indicator: 6)
                 .foregroundColor(.blue)
                 .squareFrame(350)
                 .background(Color.white.shadow(radius: 5))
