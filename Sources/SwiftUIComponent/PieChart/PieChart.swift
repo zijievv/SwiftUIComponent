@@ -38,38 +38,34 @@ public struct PieChart: View {
     }
 
     public var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                ForEach(manager.sectors, id: \.id) { sector in
-                    Sector(from: sector.start, to: sector.end)
-                        .fill(
-                            AngularGradient(
-                                gradient: Gradient(colors: sector.colors),
-                                center: .center,
-                                startAngle: sector.start,
-                                endAngle: sector.end
-                            )
+        ZStack {
+            ForEach(manager.sectors, id: \.id) { sector in
+                Sector(from: sector.start, to: sector.end)
+                    .fill(
+                        AngularGradient(
+                            gradient: Gradient(colors: sector.colors),
+                            center: .center,
+                            startAngle: sector.start,
+                            endAngle: sector.end
                         )
-                        .grayscale(!selecting || selectedID == sector.id ? 0 : 0.5)
-                        .scaleEffect(selectedID == sector.id ? 1.05 : 1)
-                        .shadow(color: .black, radius: selectedID == sector.id ? 5 : 0, x: 0, y: 0)
-                        .onTapGesture {
-                            if selectedID == sector.id {
-                                withAnimation(selectedAnimation) {
-                                    selectedID = -1
-                                }
-                            } else {
-                                withAnimation(selectedAnimation) {
-                                    selectedID = sector.id
-                                }
+                    )
+                    .grayscale(!selecting || selectedID == sector.id ? 0 : 0.5)
+                    .scaleEffect(selectedID == sector.id ? 1.05 : 1)
+                    .shadow(color: .black, radius: selectedID == sector.id ? 5 : 0, x: 0, y: 0)
+                    .onTapGesture {
+                        if selectedID == sector.id {
+                            withAnimation(selectedAnimation) {
+                                selectedID = -1
+                            }
+                        } else {
+                            withAnimation(selectedAnimation) {
+                                selectedID = sector.id
                             }
                         }
-                }
-            } //: ZStack
-            .rotationEffect(Angle(degrees: -90))
-            .padding(16)
-            .squareFrame(min(geometry.size.width, geometry.size.height))
-        }
+                    }
+            }
+        } //: ZStack
+        .rotationEffect(Angle(degrees: -90))
     }
 
     private var selecting: Bool {
@@ -79,11 +75,19 @@ public struct PieChart: View {
 
 struct PieChart_Previews: PreviewProvider {
     static var previews: some View {
-        PieChartPreview()
+        GeometryReader { geometry in
+            VStack {
+                PieChart(selectedID: .constant(-1), sectors: [(6, .blue), (7, .red), (9, .yellow)])
+                    .frame(width: 350, height: 300, alignment: .center)
+                    .background(Color.gray.opacity(0.2))
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
+            .background(Color.green.opacity(0.2).edgesIgnoringSafeArea(.all))
+        }
     }
 }
 
-fileprivate struct PieChartPreview: View {
+struct PieChartPreview: View {
     @State var selectedID: Int = 5
     let values: [Double] = [6, 7, 9]
     let colors: [Color] = [.blue, .red, .yellow]
