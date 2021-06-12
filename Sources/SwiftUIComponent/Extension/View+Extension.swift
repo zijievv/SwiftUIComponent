@@ -27,4 +27,9 @@ extension View {
             self
         }
     }
+
+    func foreground<S: View>(content: S) -> some View {
+        self.foregroundColor(.clear)
+            .overlay(content.mask(self))
+    }
 }

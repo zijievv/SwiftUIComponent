@@ -10,7 +10,7 @@
 
 import SwiftUI
 
-public struct BarChart: View {
+public struct BarChart<T>: View where T: View {
     @Binding var selectedID: Int
     let ranges: [Range<Double>]
     let indicator: Double?
@@ -19,6 +19,7 @@ public struct BarChart: View {
     let style: BarChartCell.Style
     let chartAnimation: Animation?
     let transition: AnyTransition
+    let foreground: T
 
     public init(
         selectedID: Binding<Int>,
@@ -27,7 +28,8 @@ public struct BarChart: View {
         barSpacingScale: CGFloat = 0.0083,
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
-        transition: AnyTransition = .slide
+        transition: AnyTransition = .slide,
+        foreground: @escaping () -> T
     ) {
         self.ranges = ranges
         self.indicator = indicator
@@ -37,6 +39,28 @@ public struct BarChart: View {
         self.style = barStyle
         self.chartAnimation = animation
         self.transition = transition
+        self.foreground = foreground()
+    }
+
+    public init(
+        selectedID: Binding<Int>,
+        ranges: [Range<Double>],
+        indicator: Double? = nil,
+        barSpacingScale: CGFloat = 0.0083,
+        barStyle: BarChartCell.Style = .capsule(),
+        animation: Animation? = .default,
+        transition: AnyTransition = .slide,
+        foreground: T
+    ) {
+        self.ranges = ranges
+        self.indicator = indicator
+        self.overallRange = Self.overallRange(of: ranges, indicator: indicator)
+        self._selectedID = selectedID
+        self.spacingScale = barSpacingScale
+        self.style = barStyle
+        self.chartAnimation = animation
+        self.transition = transition
+        self.foreground = foreground
     }
 
     public init(
@@ -47,7 +71,8 @@ public struct BarChart: View {
         barSpacingScale: CGFloat = 0.0083,
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
-        transition: AnyTransition = .slide
+        transition: AnyTransition = .slide,
+        foreground: @escaping () -> T
     ) {
         self.ranges = Self.floatingRanges(origin: origin, adding: intervals)
         self.indicator = indicator
@@ -57,6 +82,29 @@ public struct BarChart: View {
         self.style = barStyle
         self.chartAnimation = animation
         self.transition = transition
+        self.foreground = foreground()
+    }
+
+    public init(
+        selectedID: Binding<Int>,
+        origin: Double = 0,
+        floatingIntervals intervals: [Double],
+        indicator: Double? = nil,
+        barSpacingScale: CGFloat = 0.0083,
+        barStyle: BarChartCell.Style = .capsule(),
+        animation: Animation? = .default,
+        transition: AnyTransition = .slide,
+        foreground: T
+    ) {
+        self.ranges = Self.floatingRanges(origin: origin, adding: intervals)
+        self.indicator = indicator
+        self.overallRange = Self.overallRange(of: ranges, indicator: indicator)
+        self._selectedID = selectedID
+        self.spacingScale = barSpacingScale
+        self.style = barStyle
+        self.chartAnimation = animation
+        self.transition = transition
+        self.foreground = foreground
     }
 
     public init(
@@ -66,7 +114,8 @@ public struct BarChart: View {
         barSpacingScale: CGFloat = 0.0083,
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
-        transition: AnyTransition = .slide
+        transition: AnyTransition = .slide,
+        foreground: @escaping () -> T
     ) {
         self.ranges = values.map { 0..<$0 }
         self.indicator = indicator
@@ -76,13 +125,35 @@ public struct BarChart: View {
         self.style = barStyle
         self.chartAnimation = animation
         self.transition = transition
+        self.foreground = foreground()
+    }
+
+    public init(
+        selectedID: Binding<Int>,
+        values: [Double],
+        indicator: Double? = nil,
+        barSpacingScale: CGFloat = 0.0083,
+        barStyle: BarChartCell.Style = .capsule(),
+        animation: Animation? = .default,
+        transition: AnyTransition = .slide,
+        foreground: T
+    ) {
+        self.ranges = values.map { 0..<$0 }
+        self.indicator = indicator
+        self.overallRange = Self.overallRange(of: ranges, indicator: indicator)
+        self._selectedID = selectedID
+        self.spacingScale = barSpacingScale
+        self.style = barStyle
+        self.chartAnimation = animation
+        self.transition = transition
+        self.foreground = foreground
     }
 
     public var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Rectangle()
-                    .foregroundColor(.clear)
+//                Rectangle()
+//                    .foregroundColor(.clear)
                 if !ranges.isEmpty {
                     if indicator != nil {
                         Rectangle()
@@ -107,6 +178,7 @@ public struct BarChart: View {
                     }
                 }
             } //: ZStack
+            .foreground(content: foreground)
             .gesture(
                 DragGesture(coordinateSpace: .local)
                     .onChanged { value in
@@ -167,12 +239,27 @@ public struct BarChart: View {
 
 struct BarChart_Previews: PreviewProvider {
     static var previews: some View {
-        let values: [Range<Double>] = [-1..<1, -6..<3, 1..<5, -7..<6, -6..<7, 0..<9, 0..<14]
-        return VStack {
-            BarChart(selectedID: .constant(-1), ranges: values, indicator: 6)
-                .foregroundColor(.blue)
-                .squareFrame(350)
-                .background(Color.white.shadow(radius: 5))
+        BarChartPreview()
+    }
+}
+
+fileprivate struct BarChartPreview: View {
+    @State var id: Int = -1
+    let values: [Range<Double>] = [
+        -1..<1, -6..<3, 1..<5, -7..<6, -6..<7, 0..<9, 0..<14,
+    ]
+    var body: some View {
+        VStack {
+//            BarChart(selectedID: $id, ranges: values, indicator: 6, f)
+            BarChart(selectedID: $id, ranges: values, indicator: 7) {
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.red, Color.yellow]),
+                    startPoint: .bottom,
+                    endPoint: .top
+                )
+            }
+            .squareFrame(350)
+            .background(Color.white.shadow(radius: 5))
         }
     }
 }
