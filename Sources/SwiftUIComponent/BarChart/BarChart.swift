@@ -20,6 +20,8 @@ public struct BarChart<T>: View where T: View {
     let chartAnimation: Animation?
     let transition: AnyTransition
     let foreground: T
+    private let selectedAction: () -> Void
+    private let unselectedAction: () -> Void
 
     public init(
         selectedID: Binding<Int>,
@@ -29,7 +31,9 @@ public struct BarChart<T>: View where T: View {
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
         transition: AnyTransition = .slide,
-        foreground: @escaping () -> T
+        foreground: @escaping () -> T,
+        selectedAction: @escaping () -> Void = {},
+        unselectedAction: @escaping () -> Void = {}
     ) {
         self.ranges = ranges
         self.indicator = indicator
@@ -40,6 +44,8 @@ public struct BarChart<T>: View where T: View {
         self.chartAnimation = animation
         self.transition = transition
         self.foreground = foreground()
+        self.selectedAction = selectedAction
+        self.unselectedAction = unselectedAction
     }
 
     public init(
@@ -50,7 +56,9 @@ public struct BarChart<T>: View where T: View {
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
         transition: AnyTransition = .slide,
-        foreground: T
+        foreground: T,
+        selectedAction: @escaping () -> Void = {},
+        unselectedAction: @escaping () -> Void = {}
     ) {
         self.ranges = ranges
         self.indicator = indicator
@@ -61,6 +69,8 @@ public struct BarChart<T>: View where T: View {
         self.chartAnimation = animation
         self.transition = transition
         self.foreground = foreground
+        self.selectedAction = selectedAction
+        self.unselectedAction = unselectedAction
     }
 
     public init(
@@ -72,7 +82,9 @@ public struct BarChart<T>: View where T: View {
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
         transition: AnyTransition = .slide,
-        foreground: @escaping () -> T
+        foreground: @escaping () -> T,
+        selectedAction: @escaping () -> Void = {},
+        unselectedAction: @escaping () -> Void = {}
     ) {
         self.ranges = Self.floatingRanges(origin: origin, adding: intervals)
         self.indicator = indicator
@@ -83,6 +95,8 @@ public struct BarChart<T>: View where T: View {
         self.chartAnimation = animation
         self.transition = transition
         self.foreground = foreground()
+        self.selectedAction = selectedAction
+        self.unselectedAction = unselectedAction
     }
 
     public init(
@@ -94,7 +108,9 @@ public struct BarChart<T>: View where T: View {
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
         transition: AnyTransition = .slide,
-        foreground: T
+        foreground: T,
+        selectedAction: @escaping () -> Void = {},
+        unselectedAction: @escaping () -> Void = {}
     ) {
         self.ranges = Self.floatingRanges(origin: origin, adding: intervals)
         self.indicator = indicator
@@ -105,6 +121,8 @@ public struct BarChart<T>: View where T: View {
         self.chartAnimation = animation
         self.transition = transition
         self.foreground = foreground
+        self.selectedAction = selectedAction
+        self.unselectedAction = unselectedAction
     }
 
     public init(
@@ -115,7 +133,9 @@ public struct BarChart<T>: View where T: View {
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
         transition: AnyTransition = .slide,
-        foreground: @escaping () -> T
+        foreground: @escaping () -> T,
+        selectedAction: @escaping () -> Void = {},
+        unselectedAction: @escaping () -> Void = {}
     ) {
         self.ranges = values.map { 0..<$0 }
         self.indicator = indicator
@@ -126,6 +146,8 @@ public struct BarChart<T>: View where T: View {
         self.chartAnimation = animation
         self.transition = transition
         self.foreground = foreground()
+        self.selectedAction = selectedAction
+        self.unselectedAction = unselectedAction
     }
 
     public init(
@@ -136,7 +158,9 @@ public struct BarChart<T>: View where T: View {
         barStyle: BarChartCell.Style = .capsule(),
         animation: Animation? = .default,
         transition: AnyTransition = .slide,
-        foreground: T
+        foreground: T,
+        selectedAction: @escaping () -> Void = {},
+        unselectedAction: @escaping () -> Void = {}
     ) {
         self.ranges = values.map { 0..<$0 }
         self.indicator = indicator
@@ -147,6 +171,8 @@ public struct BarChart<T>: View where T: View {
         self.chartAnimation = animation
         self.transition = transition
         self.foreground = foreground
+        self.selectedAction = selectedAction
+        self.unselectedAction = unselectedAction
     }
 
     public var body: some View {
@@ -187,10 +213,12 @@ public struct BarChart<T>: View where T: View {
                         )
                         if new != selectedID {
                             selectedID = new
+                            selectedAction()
                         }
                     }
                     .onEnded { _ in
                         selectedID = -1
+                        unselectedAction()
                     }
             )
         }
