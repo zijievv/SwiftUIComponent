@@ -14,15 +14,21 @@ public struct PieChart: View {
     @Binding var selectedID: Int
     private let manager: PieChartManager
     private let selectedAnimation: Animation?
+    private let selectedAction: () -> Void
+    private let unselectedAction: () -> Void
 
     public init(
         selectedID: Binding<Int>,
         sectors: [(Double, Color)],
-        selectedAnimation: Animation? = .default
+        selectedAnimation: Animation? = .default,
+        selectedAction: @escaping () -> Void = {},
+        unselectedAction: @escaping () -> Void = {}
     ) {
         self._selectedID = selectedID
         self.manager = PieChartManager(sectors: sectors)
         self.selectedAnimation = selectedAnimation
+        self.selectedAction = selectedAction
+        self.unselectedAction = unselectedAction
     }
 
     public init(
@@ -30,11 +36,15 @@ public struct PieChart: View {
         values: [Double],
         startColor: Color,
         endColor: Color,
-        selectedAnimation: Animation? = .default
+        selectedAnimation: Animation? = .default,
+        selectedAction: @escaping () -> Void = {},
+        unselectedAction: @escaping () -> Void = {}
     ) {
         self._selectedID = selectedID
         self.manager = PieChartManager(values: values, startColor: startColor, endColor: endColor)
         self.selectedAnimation = selectedAnimation
+        self.selectedAction = selectedAction
+        self.unselectedAction = unselectedAction
     }
 
     public var body: some View {
@@ -56,10 +66,12 @@ public struct PieChart: View {
                         if selectedID == sector.id {
                             withAnimation(selectedAnimation) {
                                 selectedID = -1
+                                unselectedAction()
                             }
                         } else {
                             withAnimation(selectedAnimation) {
                                 selectedID = sector.id
+                                selectedAction()
                             }
                         }
                     }
