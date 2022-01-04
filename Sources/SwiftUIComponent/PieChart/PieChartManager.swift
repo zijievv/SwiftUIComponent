@@ -26,7 +26,7 @@ final class PieChartManager {
     init(sectors: [(value: Double, color: Color)]) {
         let values: [Double] = sectors.map(\.value)
         let angles: [Angle] = Self.angles(from: values)
-        self.sectors = sectors.lazy.enumerated().map { offset, sector in
+        self.sectors = sectors.enumerated().map { offset, sector in
             SectorModel(
                 id: offset,
                 start: angles[offset],
@@ -39,7 +39,7 @@ final class PieChartManager {
 
     init(values: [Double], startColor: Color, endColor: Color) {
         let angles = Self.angles(from: values)
-        self.sectors = values.lazy.enumerated().map { offset, _ in
+        self.sectors = values.enumerated().map { offset, _ in
             SectorModel(
                 id: offset,
                 start: angles[offset],

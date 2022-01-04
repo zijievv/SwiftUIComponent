@@ -198,7 +198,7 @@ public struct BarChart<T>: View where T: View {
                                 style: style
                             )
                             .transition(transition)
-                            .animation(chartAnimation)
+                            .animation(chartAnimation, value: selectedID)
                             .opacity(!selecting || selectedID == offset ? 1 : 0.33)
                         }
                     }
